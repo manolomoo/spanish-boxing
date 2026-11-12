@@ -1,0 +1,63 @@
+:root{--tint:#eef3ff;--bg:#f6f7fb;--fg:#1b1d24;--mu:#6b7080;--cd:#fff;--ln:#e3e5ec;--ac:#2f6fed;--ok:#1a9a5a;--bad:#d64545}
+@media(prefers-color-scheme:dark){:root{--tint:#232a3b;--bg:#121318;--fg:#eceef4;--mu:#9aa0b0;--cd:#1d1f27;--ln:#2c2f3a;--ac:#6ea0ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;padding-bottom:70px}
+.w{max-width:600px;margin:0 auto;padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px}h1{font-size:24px;margin:4px 0}h2{font-size:20px;margin:14px 0 0;padding-top:6px;border-top:2px solid var(--ln)}
+.box{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}.c{text-align:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--ln);border-radius:8px;padding:3px}.seg button{flex:1 1 auto;padding:8px 10px;border:0;border-radius:6px;font-size:15px;background:transparent;color:var(--fg)}.seg button.on{background:var(--ac);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px}.b{flex:1 1 110px;padding:12px;font-size:17px;border-radius:10px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);font-weight:600}.b.p{background:var(--ac);color:#fff}
+.big{font-size:38px;font-weight:800;overflow-wrap:anywhere}.hl{color:var(--ac)}.mu{color:var(--mu)}.cue{padding:10px;border-radius:10px;background:var(--ln);font-size:18px;font-weight:700}.tx .cue:empty{display:none}
+.ga{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.ca{position:relative;background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:26px 10px 10px;text-align:center;cursor:pointer;min-width:0}
+.ca.cur{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac) inset}.ca .en{font-size:17px;font-weight:800;overflow-wrap:anywhere}.ca .zh{font-size:14px;margin-top:2px}.ca .tg{font-size:12px;color:var(--mu);margin-top:4px}.ca .sp{position:absolute;top:8px;right:10px;font-size:14px;opacity:.7}
+.sen{font-size:20px;font-weight:700;line-height:1.4}.def{font-size:17px;line-height:1.5}
+.sn{position:relative;padding:6px 40px 6px 8px;border-radius:8px;font-size:18px;line-height:1.55;cursor:pointer}.sn.hl{background:var(--tint);outline:2px solid var(--ac)}.pa{margin-bottom:10px}
+.sn .pm{position:absolute;right:4px;top:6px;font-size:12px}.kw{background:#ffe9a8;color:#1b1d24;border-radius:4px;padding:0 3px;font-weight:700}.kw sup{color:#c0392b;font-size:11px;margin-right:2px}.gl{color:var(--mu);font-size:14px}
+.tb{width:100%;border-collapse:collapse;font-size:16px}.tb td{padding:8px;border-bottom:1px solid var(--ln);cursor:pointer}.tb td:first-child{font-weight:700;width:38%}
+a.nav{color:var(--ac)}
+
+/* week header + jump nav */
+.wk{display:flex;flex-direction:column;gap:6px}
+.wk-top{display:flex;align-items:baseline;gap:8px 12px;flex-wrap:wrap;font-size:15px}
+.wk h1{font-size:16px;margin:0;display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.wk-date{font-size:14px;font-weight:600;color:var(--mu);letter-spacing:0;opacity:.95}
+.jump{position:sticky;top:0;z-index:30;background:var(--bg);margin:0 -16px;padding:2px 8px 0;
+  box-shadow:0 8px 0 0 var(--bg)}
+.jump-bar{display:flex;border-bottom:1px solid var(--ln)}
+.jump button{flex:1;padding:11px 6px 10px;font-size:16px;font-weight:650;line-height:1.2;border:0;border-radius:0;background:transparent;color:var(--mu);-webkit-tap-highlight-color:transparent;position:relative}
+.jump button.on{background:transparent;color:var(--fg);font-weight:800}
+.jump button.on::after{content:"";position:absolute;left:22%;right:22%;bottom:-1px;height:2.5px;background:var(--ac);border-radius:2px 2px 0 0}
+.panel[hidden]{display:none!important}
+.panel{display:flex;flex-direction:column;gap:10px}
+
+#pv,#pl,#nx{flex:1 1 0;min-width:0;padding:12px 6px;font-size:15px;white-space:nowrap}
+.zhs{display:none;font-size:15px;line-height:1.5;color:var(--mu);font-weight:400;margin-top:2px}.showzh .zhs{display:block}
+.vl{border-top:1px solid var(--ln);padding-top:10px;display:flex;flex-direction:column;gap:4px}.vw{font-size:15px;line-height:1.45}.vw.pl{cursor:pointer}.vw .vn{color:#c0392b;margin-right:3px}
+
+.bc{padding:12px 14px;gap:4px}.bc .big{font-size:34px;line-height:1.15}.bc .pm{line-height:1.1}.bc .pm:empty,.bc #en:empty,.bc #ex:empty{display:none}.bc #tag{font-size:15px;line-height:1.3}.bc #tag .nt{font-size:12px;display:block}.bc #ex{text-align:center;margin-top:4px;line-height:1.4}.bc .cue{padding:6px 10px;font-size:16px;margin-top:2px}
+.bc .cue:empty{display:none}
+
+.ph{margin:10px 0;padding:0}.ph img{display:block;width:100%;height:180px;object-fit:cover;border-radius:12px}.ph figcaption{font-size:11px;color:var(--mu);margin-top:4px;line-height:1.4}
+/* 單字頁：分組按鈕（簡稱＋張數）與大卡插圖 */
+#grp{flex-wrap:nowrap}#grp button{flex:1 1 0;min-width:0;padding:6px 4px;font-size:15px;line-height:1.2;white-space:nowrap}#grp button small{display:block;font-size:12px;font-weight:600;opacity:.85}
+.bc .ic{width:68px;height:68px;margin:0 auto 2px}.bc .ic:empty{display:none}.bc .ic svg{display:block;width:100%;height:100%;border-radius:12px}.bc .ic:has(.n2){width:120px}.bc .ic:has(.n3){width:168px}
+.bc{padding:10px 14px;gap:3px}
+.ca .ci{width:38px;height:38px;margin:22px auto 8px}.ca .ci svg{display:block;width:100%;height:100%;border-radius:10px}.ca .ci:has(.n2){width:72px}.ca .ci:has(.n3){width:104px}.ca:has(.ci){padding-top:10px}
+
+/* ===== 西班牙文站追加 ===== */
+/* 插圖：Twemoji <img>（1–3 張並排）與顏色色塊 */
+.im{display:flex;width:100%;height:100%;align-items:center;justify-content:center;gap:3px}.im img{display:block;flex:1 1 0;min-width:0;max-width:100%;max-height:100%}
+.sw{display:block;width:100%;height:100%;border-radius:12px;border:1px solid var(--ln);box-shadow:inset 0 0 0 1px #0001}
+/* 大卡：長句縮字、英文翻譯、例字 */
+.bc .big.md{font-size:27px}.bc .big.lg{font-size:21px;line-height:1.3}
+#en,.enx{color:var(--ac);font-weight:700;font-size:16px;line-height:1.4;overflow-wrap:anywhere}
+.bc #tag,.bc #zh,.ca .tg,.ca .zh{overflow-wrap:anywhere}
+.b:disabled{opacity:.4}
+/* 分組多於 4 個：橫向捲動 */
+#grp.many{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}#grp.many button{flex:0 0 auto;padding:6px 12px}
+/* 課文分頁的文法說明框 */
+.info{display:flex;flex-direction:column;gap:8px;font-size:16px;line-height:1.6}
+.showzh .zhs{font-size:14px}
+/* 口說練習提示圖、吊人遊戲鍵盤 */
+.dic{width:84px;height:84px;margin:0 auto}.dic:empty{display:none}.dic:has(.n2){width:140px}.dic:has(.n3){width:200px}
+#hk .b{flex:1 1 40px;padding:8px;font-size:17px}#hk .b:disabled{opacity:.35}
+.ft{font-size:12px;color:var(--mu);line-height:1.6;margin-top:6px}
