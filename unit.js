@@ -24,6 +24,8 @@ function cycles(c){const P=partsOf(c),n=P.length;const a=P.map((k,j)=>({k,rounds
 function startIdx(k=g){const L=G[k].cards;let b=0,m=Infinity;for(let k=0;k<L.length;k++){const n=RW.pget(W.uid+"|cards|"+key(L[k]))||0;if(n<m){m=n;b=k}}return b}
 function pickStart(){if(playing)return;i=startIdx();render()}
 function play1(k){return TTS.play(k,rate)}
+/* 手機：每個會開始播音的點擊，當下先解鎖共用的 <audio>（之後回音法靜音間隔後的下一段才不會被自動播放政策擋住）。 */
+const unlock=()=>{try{TTS.unlock&&TTS.unlock()}catch(e){}};
 const wait=s=>{const t=TTS.sess();return new Promise(r=>setTimeout(()=>r(TTS.sess()===t),s*1000))};
 async function seq(keys){let t=0;for(const k of keys){const d=await play1(k);if(d==null)return t;t+=d}return t}
 function seg(el,opts,sel,on){el.innerHTML="";opts.forEach((o,k)=>{const b=document.createElement("button");b.textContent=o;if(k===sel)b.className="on";b.onclick=()=>{on(k);seg(el,opts,k,on)};el.appendChild(b)})}
@@ -34,18 +36,18 @@ function clearHl(){document.querySelectorAll(".sn.hl").forEach(e=>e.classList.re
    d 是實際音檔秒數，短的停短、長的停長；另設下限避免單字太倉促。 */
 const echoGap=d=>Math.max(1,d+.3),shadowGap=d=>Math.max(1.5,d*1.25+.6);
 function stop(){TTS.cancel();run++;playing=false;cc=null;setCue("");clearHl();render()}
-async function once(keys){stop();await seq(keys)}
-async function cardOnce(c,keys){stop();cc=c;await seq(keys)}   // cc＝目前在念哪張卡（rw.js 用它把例句／分段記回這張卡）
+async function once(keys){unlock();stop();await seq(keys)}
+async function cardOnce(c,keys){unlock();stop();cc=c;await seq(keys)}   // cc＝目前在念哪張卡（rw.js 用它把例句／分段記回這張卡）
 /* ===== 單字圖卡 ===== */
 function grid(){$("ga").innerHTML=list().map((c,k)=>{const ic=icon(c);return `<div class="ca${k===i?" cur":""}" data-k="${k}"><span class="sp">🔊</span>${ic?`<div class="ci">${ic}</div>`:""}<div class="en">${esc(c.w)}</div><div class="zh">${esc(c.zq||c.zh||"")}</div><div class="tg">${esc(c.tg||c.pos||"")}</div></div>`}).join("");
- $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{stop();i=+el.dataset.k;render();const c=list()[i];cardOnce(c,allKeys(c))})}
+ $("ga").querySelectorAll(".ca").forEach(el=>el.onclick=()=>{unlock();stop();i=+el.dataset.k;render();const c=list()[i];cardOnce(c,allKeys(c))})}
 function render(){const L=list();if(i>=L.length)i=0;const c=L[i],o=G[g].o||["念單字","念例句"];$("pl").textContent=playing?"⏸ 暫停":"▶ 回音法播放";grpLabels();
  $("ic").innerHTML=icon(c);const w=$("w");w.textContent=c.w;w.classList.toggle("md",c.w.length>12&&c.w.length<=24);w.classList.toggle("lg",c.w.length>24);
  $("zh").textContent=c.zh||"";$("tag").textContent=c.pos||"";$("en").textContent=c.en||"";
  $("ex").innerHTML=(c.exs?`<div class="mu">例：${c.exs.map(esc).join("・")}</div>`:"")+(c.ex?`<div>${esc(c.ex)}</div>`+(c.exen?`<div class="enx">${esc(c.exen)}</div>`:"")+(c.exzh?`<div class="mu">${esc(c.exzh)}</div>`:""):"");
  $("o1").textContent=o[0];$("o2").textContent=o[1];$("o2").disabled=!o2Keys(c).length;
  grid()}
-async function play(){TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
+async function play(){unlock();TTS.cancel();const r=++run,s0=TTS.sess();playing=true;render();const ok=()=>run===r&&TTS.sess()===s0;const L=list();
  while(ok()&&i<L.length){render();const c=L[i],cy=cycles(c);cc=c;
   for(let j=0;j<cy.length;j++){const p=cy[j];for(let k=0;k<p.rounds;k++){setCue("listen",p.lb);$("w").classList.add("hl");const d=await play1(p.k);$("w").classList.remove("hl");if(d==null||!ok())return;
    setCue("echo",p.lb);if(!await wait(echoGap(d))||!ok())return;setCue("shadow",p.lb);if(!await wait(shadowGap(d))||!ok())return}}
@@ -62,12 +64,12 @@ function textsHTML(){return (W.texts||[]).map(t=>{const ids=[];const body=(t.par
   ${has&&t.zh?`<div class="row"><button class="b" data-a="zh">隱藏中文</button></div>`:""}
   ${has?`<div class="story">${body}</div>`:""}${t.note?`<div class="mu" style="font-size:13px">${esc(t.note)}</div>`:""}${has?`<div class="mu" style="font-size:12px">點任一句可單獨聽。</div>`:""}</div>`}).join("")}
 function bindTexts(){(W.texts||[]).forEach(t=>{if(!t.ids.length)return;const box=$("tx-"+t.id),cue=box.querySelector(".cue");
- box.querySelectorAll(".sn").forEach(e=>e.onclick=()=>{stop();const j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))});
+ box.querySelectorAll(".sn").forEach(e=>e.onclick=()=>{unlock();stop();const j=+e.dataset.j;e.classList.add("hl");play1(SENT[j]).then(()=>e.classList.remove("hl"))});
  box.querySelector('[data-a="stop"]').onclick=stop;
  const zb=box.querySelector('[data-a="zh"]');if(zb)zb.onclick=()=>{const on=box.classList.toggle("showzh");zb.textContent=on?"隱藏中文":"顯示中文"};
- box.querySelector('[data-a="all"]').onclick=async()=>{stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
+ box.querySelector('[data-a="all"]').onclick=async()=>{unlock();stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
   for(let n=0;n<t.ids.length&&ok();n++){const j=t.ids[n];const e=$("s"+j);e.classList.add("hl");cueEl(cue,"listen","【"+(n+1)+"/"+t.ids.length+"】");const d=await play1(SENT[j]);e.classList.remove("hl");if(d==null||!ok())return;if(!await wait(.35))return}if(ok())cue.textContent=""};
- box.querySelector('[data-a="echo"]').onclick=async()=>{stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
+ box.querySelector('[data-a="echo"]').onclick=async()=>{unlock();stop();const r=run,s0=TTS.sess();const ok=()=>run===r&&TTS.sess()===s0;
   for(let n=0;n<t.ids.length&&ok();n++){const j=t.ids[n],e=$("s"+j),lb="【"+(n+1)+"/"+t.ids.length+"】";e.classList.add("hl");cueEl(cue,"listen",lb);const d=await play1(SENT[j]);if(d==null||!ok()){e.classList.remove("hl");return}
    cueEl(cue,"echo",lb);if(!await wait(echoGap(d))||!ok()){e.classList.remove("hl");return}cueEl(cue,"shadow",lb);if(!await wait(shadowGap(d))||!ok()){e.classList.remove("hl");return}e.classList.remove("hl")}if(ok())cue.textContent="完成 ✔"}})}
 /* ===== 小測驗：W.quiz＝原版的教學題（冠詞、動詞變化、estar／現在分詞、性數一致、Ser…），選項順序固定；
@@ -82,7 +84,7 @@ function prep(q){const c=q.c;q.say=key(c);q.k=q.t+"|"+key(c);
  else{q.q=zq(c);q.z="哪個西班牙文單字／詞組？";q.a=c.w;const d=[];shuf(ALL.filter(x=>x!==c&&x.zh&&zq(x)!==zq(c)&&x.w!==c.w)).forEach(x=>{if(d.length<3&&!d.includes(x.w))d.push(x.w)});q.o=shuf([c.w,...d])}}
 function quiz(){const q=Q[qi];if(!q.o)prep(q);$("sc").textContent="答對 "+score+" / "+done;$("qw").textContent=pk&&q.show?q.show:q.q;$("qz").textContent=q.z;$("qo").innerHTML="";
  q.o.forEach(o=>{const b=document.createElement("button");b.className="b";b.textContent=o;if(pk&&o===q.a){b.style.background="var(--ok)";b.style.color="#fff"}else if(pk===o)b.style.color="var(--bad)";
-  b.onclick=()=>{if(pk)return;pk=o;done++;if(o===q.a)score++;quiz();cc=null;play1(q.say)};$("qo").appendChild(b)});
+  b.onclick=()=>{if(pk)return;unlock();pk=o;done++;if(o===q.a)score++;quiz();cc=null;play1(q.say)};$("qo").appendChild(b)});
  $("qr").textContent=pk?(pk===q.a?"¡Muy bien! 答對了 👏":"正確答案是 "+q.a):"";$("qr").style.color=pk===q.a?"var(--ok)":"var(--bad)";$("qn").style.display=pk?"":"none"}
 $("qn").onclick=()=>{pk=null;let n=qi;while(Q.length>1&&n===qi)n=Math.floor(Math.random()*Q.length);qi=n;if(!Q[qi].fixed)Q[qi].o=null;quiz()};
 /* ===== 口說練習（decks）：kind "say"＝看提示先說、再看答案＋聽；kind "qa"＝問答。item.pic＝提示圖、item.say＝音檔 key（預設同 a） ===== */
@@ -91,9 +93,9 @@ function drill(){const d=DK[dk],it=d.items[di];$("dlab").textContent=d.lab||(d.k
  $("dic").innerHTML=it.pic&&window.PIC?window.PIC(it.pic):"";
  $("dq").textContent=it.q;$("da").textContent=d.kind==="say"?it.a.join(d.join||" / "):it.a[0];$("da").style.visibility="hidden";
  $("dnote").textContent=(it.note||"")+(it.tag?"（"+it.tag+"）":"")||"";$("dnote").style.display="none";$("dpos").textContent=d.name+"　"+(di+1)+" / "+d.items.length}
-$("dr").onclick=()=>{$("da").style.visibility="visible";$("dnote").style.display="";const d=DK[dk],it=d.items[di],ks=it.say||it.a;once(d.kind==="say"?ks:[ks[0]])};
+$("dr").onclick=()=>{unlock();$("da").style.visibility="visible";$("dnote").style.display="";const d=DK[dk],it=d.items[di],ks=it.say||it.a;once(d.kind==="say"?ks:[ks[0]])};
 $("dn").onclick=()=>{stop();const n=DK[dk].items.length;di=n>1?(di+1+Math.floor(Math.random()*(n-1)))%n:0;drill()};
-$("dq").onclick=()=>{if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
+$("dq").onclick=()=>{unlock();if(DK[dk].kind==="qa")once([DK[dk].items[di].q.replace(/^(Q\d|Question):\s*/,"")])};
 /* ===== 吊人遊戲 Ahorcado（W.hang 且頁面有 #hk 才啟用）：猜名詞（卡的 alt），提示＝中文＋冠詞 ===== */
 const HW=W.hang&&$("hk")?ALL.filter(c=>c.alt&&c.alt[0]&&c.w.includes(" ")):[];
 let hi=0,hg=new Set(),hx=0,hsp=0;
@@ -101,13 +103,14 @@ const nrm=s=>s==="ñ"?s:s.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 function hang(){if(!HW.length)return;const c=HW[hi],w=c.alt[0],art=c.w.split(" ")[0];const won=[...w].every(ch=>hg.has(nrm(ch))||hg.has(ch)),lost=hx>=6;
  $("hz").textContent="提示："+c.zh+"（冠詞 "+art+"）";$("hw").textContent=[...w].map(ch=>(won||lost||hg.has(nrm(ch))||hg.has(ch))?ch:"_").join(" ");$("hm").textContent="錯誤 "+hx+" / 6";
  $("hk").innerHTML="";"abcdefghijklmnñopqrstuvwxyz".split("").forEach(l=>{const b=document.createElement("button");b.className="b";b.textContent=l;b.disabled=hg.has(l)||won||lost;
-  b.onclick=()=>{hg.add(l);if(![...w].some(ch=>nrm(ch)===l||ch===l))hx++;hang()};$("hk").appendChild(b)});
+  b.onclick=()=>{unlock();hg.add(l);if(![...w].some(ch=>nrm(ch)===l||ch===l))hx++;hang()};$("hk").appendChild(b)});
  $("hr").textContent=won?"¡Muy bien! "+c.w:lost?"答案："+c.w:"";$("hr").style.color=won?"var(--ok)":"var(--bad)";if((won||lost)&&!hsp){hsp=1;cc=null;play1(key(c))}}
 function hangNew(){if(!HW.length)return;let n=hi;while(HW.length>1&&n===hi)n=Math.floor(Math.random()*HW.length);hi=n;hg=new Set();hx=0;hsp=0;hang()}
-if(HW.length){$("hn").onclick=()=>{stop();hangNew()};$("hh").onclick=()=>once([HW[hi].alt[0]])}
+if(HW.length){$("hn").onclick=()=>{stop();hangNew()};$("hh").onclick=()=>{unlock();once([HW[hi].alt[0]])}}
 /* ===== 按鈕 ===== */
-$("o1").onclick=()=>{const c=list()[i];cardOnce(c,o1Keys(c))};$("o2").onclick=()=>{const c=list()[i],ks=o2Keys(c);if(ks.length)cardOnce(c,ks)};
-$("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>playing?stop():play();
+$("o1").onclick=()=>{unlock();const c=list()[i];cardOnce(c,o1Keys(c))};$("o2").onclick=()=>{unlock();const c=list()[i],ks=o2Keys(c);if(ks.length)cardOnce(c,ks)};
+$("pv").onclick=()=>{stop();i=(i-1+list().length)%list().length;render()};$("nx").onclick=()=>{stop();i=(i+1)%list().length;render()};$("pl").onclick=()=>{unlock();playing?stop():play()};
+["pl","o1","o2"].forEach(id=>{const el=$(id);if(el)el.addEventListener("pointerdown",unlock,{passive:true})});
 $("texts").innerHTML=textsHTML();bindTexts();
 const gLast=G.map(()=>-1);
 /* 分組按鈕：簡稱＋張數。選中組用目前 i，其他組用上次停留張數（沒去過則該組的起始張，同 startIdx 規則） */
