@@ -1,0 +1,60 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache"><meta name="viewport" content="width=device-width,initial-scale=1"><title>單元 6｜指示詞 Demostrativos・西班牙文-拳王之路</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🥊%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css?v=3"></head><body><div class="w">
+<header class="wk">
+<div class="wk-top"><a class="nav" href="index.html">← 西班牙文首頁</a>
+<h1>單元 6<span class="wk-date">指示詞 Demostrativos</span></h1></div>
+<nav class="jump" id="jump" aria-label="本單元內容">
+<div class="jump-bar">
+<button type="button" class="on" data-sec="v">單字</button>
+<button type="button" data-sec="t">課文</button>
+<button type="button" data-sec="o">其他</button>
+</div>
+</nav>
+</header>
+<div id="nov" style="display:none;color:var(--bad);font-size:14px">⚠️ 這個瀏覽器不支援音訊播放，請改用 Chrome／Safari／Edge。</div>
+
+<section id="sec-v" class="panel">
+<div class="seg" id="grp"></div>
+<div class="box c bc"><div class="ic" id="ic"></div><div class="big" id="w"></div><div style="font-size:22px;font-weight:700;color:var(--ac)" id="zh"></div><div class="mu" id="tag"></div><div id="en"></div><div id="ex"></div><div class="cue" id="cue"></div></div>
+<div class="row" style="flex-wrap:nowrap"><button class="b" id="o1">念單字</button><button class="b" id="o2">念例句</button></div>
+<div class="row"><button class="b" id="pv">‹ 上一個</button><button class="b p" id="pl">▶ 回音法播放</button><button class="b" id="nx">下一個 ›</button></div>
+<div class="mu">語速</div><div class="seg" id="rate"></div>
+<div class="box"><b>單字卡</b><div class="mu" style="font-size:14px">點卡聽發音（單字→例句），並切換到這張卡練習。</div><div class="ga" id="ga"></div></div>
+</section>
+
+<section id="sec-t" class="panel" hidden>
+<div id="texts" style="display:flex;flex-direction:column;gap:14px"></div>
+</section>
+
+<section id="sec-o" class="panel" hidden>
+<div class="box c"><b>小測驗：選出正確的指示詞</b><div class="mu" id="sc"></div><div class="sen" id="qw"></div><div class="mu" id="qz"></div><div class="row" id="qo"></div><div id="qr" style="font-weight:700;font-size:18px"></div><button class="b p" id="qn" style="display:none">下一題 ›</button></div>
+<div class="box c"><b>口說練習：看情境說指示詞</b><div class="seg" id="dkseg"></div><div class="mu" id="dpos"></div><div class="mu" id="dlab"></div><div class="dic" id="dic"></div><div class="sen" id="dq" style="cursor:pointer"></div><div class="sen hl" id="da" style="visibility:hidden"></div><div class="mu" id="dnote" style="font-size:14px"></div><div class="mu" style="font-size:13px">先大聲說，再按「看答案＋聽」聽示範、跟讀。</div><div class="row"><button class="b p" id="dr">看答案＋聽</button><button class="b" id="dn">換一題 ›</button></div></div>
+<div id="rw"></div>
+<div class="ft">發音：西班牙文 Elvira（es-ES）、英文 Jenny（en-US），皆為預錄自然語音。圖示：Twemoji（CC-BY 4.0）；顏色用色塊。</div>
+</section>
+</div>
+<script>window.PAGEVER="3"</script><script src="rw.js?v=3"></script><script src="rpg.js?v=3"></script><script src="week06-audio.js?v=3"></script><script src="speech.js?v=3"></script><script src="week06-data.js?v=3"></script><script src="week06-icons.js?v=3"></script><script src="unit.js?v=3"></script>
+<script>
+(function(){
+  const nav=document.getElementById("jump");
+  if(!nav)return;
+  function show(id,scroll){
+    ["v","t","o"].forEach(s=>{
+      const el=document.getElementById("sec-"+s);
+      if(el)el.hidden=s!==id;
+    });
+    nav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.sec===id));
+    try{TTS&&TTS.cancel&&TTS.cancel()}catch(e){}
+    if(id==="v"&&typeof pickStart==="function")pickStart();
+    if(scroll)window.scrollTo({top:0,behavior:"instant"});
+  }
+  nav.addEventListener("click",e=>{
+    const b=e.target.closest("button[data-sec]");
+    if(!b)return;
+    history.replaceState(null,"","#"+b.dataset.sec);
+    show(b.dataset.sec,true);
+  });
+  const init=(location.hash||"").replace("#","").replace("sec-","");
+  if(["v","t","o"].includes(init))show(init,false);
+})();
+</script>
+</body></html>

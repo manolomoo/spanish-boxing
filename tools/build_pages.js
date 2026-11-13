@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* node tools/build_pages.js
-   依 version.txt 產生 index.html 與 week00–05.html（頁面殼）。升版：改 version.txt 後重跑，PAGEVER／version.txt／所有 ?v= 就會一致。 */
+   依 version.txt 產生 index.html 與 week00–06.html（頁面殼）。升版：改 version.txt 後重跑，PAGEVER／version.txt／所有 ?v= 就會一致。 */
 const fs=require("fs"),path=require("path"),ROOT=path.resolve(__dirname,"..");
 const V=fs.readFileSync(path.join(ROOT,"version.txt"),"utf8").trim();
 const SITE="西班牙文-拳王之路";
@@ -13,7 +13,8 @@ const U=[
  {n:2,name:"冠詞＋單字",quiz:"小測驗：選出正確的冠詞・單字中文",speak:"口說練習：Hay ________ en la foto.",hang:1},
  {n:3,name:"動詞 Verbos 1",quiz:"小測驗：選出正確的動詞變化",speak:"口說練習：替換主詞說動詞"},
  {n:4,name:"Estar + Gerundio",quiz:"小測驗：填入 estar 或現在分詞",speak:"口說練習：看圖說兩句"},
- {n:5,name:"Ser + 形容詞・顏色",quiz:"小測驗：性數一致・Ser 變位・Escribe",speak:"口說練習：Ser + 形容詞"}];
+ {n:5,name:"Ser + 形容詞・顏色",quiz:"小測驗：性數一致・Ser 變位・Escribe",speak:"口說練習：Ser + 形容詞"},
+ {n:6,name:"指示詞 Demostrativos",quiz:"小測驗：選出正確的指示詞",speak:"口說練習：看情境說指示詞"}];
 const index=`${HEAD}
 <title>${SITE}</title>${ICON}<style>
 :root{--bg:#f6f7fb;--fg:#1b1d24;--mu:#6b7080;--cd:#fff;--ln:#e3e5ec;--ac:#2f6fed}
