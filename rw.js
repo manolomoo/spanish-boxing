@@ -9,7 +9,7 @@ const UNITS=[
  {id:"u3",n:3,file:"week03.html",name:"動詞 Verbos 1",title:"10 個常用動詞的現在式變化＋現在分詞",count:"卡片 70 張（10 個動詞＋60 個變位）・課文 1 則・口說 30 題",types:["cards","quiz","speak"]},
  {id:"u4",n:4,file:"week04.html",name:"Estar + Gerundio",title:"正在做…：看圖說「Hay … en la foto. … está …」",count:"卡片 26 張・照片造句 11 組・看圖說兩句",types:["cards","story","quiz","speak"]},
  {id:"u5",n:5,file:"week05.html",name:"Ser + 形容詞・顏色",title:"形容詞性數一致、顏色、動詞 Ser",count:"卡片 93 張（陰陽性・顏色・Pronuncia・名詞・形容詞・Ser）・課文 3 則",types:["cards","story","quiz","speak"]},
- {id:"u6",n:6,file:"week06.html",name:"指示詞 Demostrativos",title:"近處 este / esta / estos / estas、中距離 ese / esa / esos / esas、中性 esto / eso",count:"卡片 29 張（指示詞 10・英文 6・名詞片語 13）・課文：解說＋表格＋記憶遊戲 3 個＋跟讀 13 句・口說 12 題",types:["cards","story","quiz","speak"]}];
+ {id:"u6",n:6,file:"week06.html",name:"指示詞 Demostrativos",title:"近處 este / esta / estos / estas、中距離 ese / esa / esos / esas、中性 esto / eso",count:"卡片 43 張（指示詞 10・中性句 2・英文 6・名詞片語 25）・課文：解說＋表格＋記憶遊戲 3 個＋跟讀 13 句・測驗 Ejercicio 16 題・口說 16 題",types:["cards","story","quiz","speak"]}];
 const TN={cards:"單字圖卡",quiz:"小測驗",speak:"口說練習",hang:"吊人遊戲",story:"課文跟讀"};
 const RULE={cards:"每張單字卡都聽過一次（點卡、念單字或回音法都算）",quiz:"同一次練習中作答滿 10 題，且正確率 ≥ 80%",speak:"在 5 個不同的題目上按「看答案＋聽」並跟著說",hang:"猜對 3 個不同的單字",story:"課文每一句都聽過（每篇全文連播一次即可）"};
 const KEY="esBoxerRW1";let MEM=null,LSOK=true;try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){LSOK=false}
