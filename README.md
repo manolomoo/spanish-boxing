@@ -5,6 +5,7 @@
 - 發音全部是預錄 mp3：西班牙文 Elvira（es-ES）、英文 Jenny（en-US）。找不到音檔只會在 console 警告並跳過。
 - 每個單元：`weekNN.html` ＋ `weekNN-data.js`（`window.WEEK`）＋ `weekNN-audio.js`（文字→mp3）＋ `weekNN-icons.js`；共用 `unit.js`、`speech.js`、`rw.js`、`rpg.js`、`style.css`。
 - 單元 0–5 的音檔取自原版站；單元 6 的音檔用 edge-tts（Elvira／Jenny）產生，檔名 `es_<sha1 16 位>.mp3`／`en_<sha1 16 位>.mp3`。
+- 單元 6 的課文分頁另外載入 `week06-extra.js`（`build_pages.js` 的 `extra` 旗標，body 加 class `u6`）：解說、指示詞表格、esto／eso、常見錯誤與口訣、3 個記憶遊戲；資料在 `week06-data.js` 的 `lab`，會念的字列在 `lab.say`。遊戲答對紀錄存在 localStorage `esBoxerU6G1`。
 - 圖示：Twemoji（CC-BY 4.0）。
 
 ## 工具（node，無相依套件）

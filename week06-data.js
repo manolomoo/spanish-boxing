@@ -2,8 +2,44 @@
    卡片欄位：w 顯示的字、say 這張卡的音檔 key（預設同 w；也是練習紀錄的 key）、lang "en"＝英文卡（Jenny），其餘西文（Elvira）、
    zh 中文、pos 標籤、tg 小卡標籤（預設同 pos）、parts 回音法要分開各走一輪的每一段（預設只有 say）、exs 顯示用的例字、
    alt「只念名詞」等第二顆按鈕念的字（不進回音週期）、ex 例句、exen 例句英文翻譯、en 這張卡本身的英文翻譯（英文翻譯只顯示＋單次念，不進回音週期）
-   quiz 是講義的練習題（教學內容，勿刪）；autoQuiz＝另外自動出「西文↔中文」題。decks 口說練習；texts 課文分頁（html＝只顯示的文法說明、paras＝可跟讀的句子，[[…]]＝只顯示不念） */
+   quiz 是講義的練習題（教學內容，勿刪）；autoQuiz＝另外自動出「西文↔中文」題。decks 口說練習；texts 課文分頁的跟讀（paras＝可跟讀的句子，[[…]]＝只顯示不念）；lab 課文分頁的解說／表格／遊戲（week06-extra.js）。
+   v4 起課文分頁改用新講義（Demostrativos 新版：Ejercicio 16 題）；單字卡、小測驗、口說仍是舊講義內容。 */
 window.WEEK=(function(){
+const LAB=(function(){
+ const forms={c:{m:["Este","Estos"],f:["Esta","Estas"],neu:"Esto"},m:{m:["Ese","Esos"],f:["Esa","Esas"],neu:"Eso"}};
+ const nouns=[["perro","perros","m","狗","1f415"],["niño","niños","m","男孩","1f466"],["teléfono","teléfonos","m","電話","1f4f1"],["profesor","profesores","m","男老師","1f468-200d-1f3eb"],
+  ["fruta","frutas","f","水果","1f34e"],["niña","niñas","f","女孩","1f467"],["verdura","verduras","f","蔬菜","1f966"],["profesora","profesoras","f","女老師","1f469-200d-1f3eb"]];
+ const E=(q,a,o,say,zh,d,g,n,noun,art)=>({q,a,o,say,zh,d,g,n,noun,art});
+ const ej=[
+  E("(Cerca) ______ niño es mi amigo.","Este",["Este","Esto","Esta","Estos"],"Este niño es mi amigo.","這個男孩是我的朋友。","c","m","s","niño","el"),
+  E("(Media distancia) ______ perros están allí.","Esos",["Esos","Esas","Ese","Estos"],"Esos perros están allí.","那些狗在那裡。","m","m","p","perros","los"),
+  E("(Cerca) ______ fruta es roja.","Esta",["Esta","Este","Estas","Esa"],"Esta fruta es roja.","這個水果是紅色的。","c","f","s","fruta","la"),
+  E("(Media distancia) ______ profesores son buenos.","Esos",["Esos","Esas","Estos","Ese"],"Esos profesores son buenos.","那些老師很好。","m","m","p","profesores","los"),
+  E("(Cerca) ______ teléfonos son pequeños.","Estos",["Estos","Estas","Esos","Este"],"Estos teléfonos son pequeños.","這些電話很小。","c","m","p","teléfonos","los"),
+  E("(Media distancia) ______ nieve es blanca.","Esa",["Esa","Ese","Esas","Esto"],"Esa nieve es blanca.","那片雪是白色的。","m","f","s","nieve","la"),
+  E("(Desconocido / Unknown) ¿Qué es ______?","esto",["esto","este","esta","estos"],"¿Qué es esto?","這是什麼？","c","n","unk","",""),
+  E("(Idea / Situation) ______ es fácil.","Eso",["Eso","Ese","Esa","Esos"],"Eso es fácil.","那（件事）很簡單。","m","n","idea","",""),
+  E("(Cerca) ______ verduras son grandes.","Estas",["Estas","Estos","Estes","Esas"],"Estas verduras son grandes.","這些蔬菜很大。","c","f","p","verduras","las"),
+  E("(Media distancia) ______ teléfono es pequeño.","Ese",["Ese","Eso","Esa","Este"],"Ese teléfono es pequeño.","那支電話很小。","m","m","s","teléfono","el"),
+  E("(Cerca) ______ amigos están aquí.","Estos",["Estos","Estas","Esos","Esto"],"Estos amigos están aquí.","這些朋友在這裡。","c","m","p","amigos","los"),
+  E("(Media distancia) ______ familia es buena.","Esa",["Esa","Ese","Esas","Esta"],"Esa familia es buena.","那個家庭很好。","m","f","s","familia","la"),
+  E("(Desconocido / Unknown) ¿Qué es ______?","eso",["eso","ese","esa","esos"],"¿Qué es eso?","那是什麼？","m","n","unk","",""),
+  E("(Idea / Situation) ______ es difícil.","Esto",["Esto","Este","Esta","Estos"],"Esto es difícil.","這（件事）很難。","c","n","idea","",""),
+  E("(Cerca) ______ niña es mi amiga.","Esta",["Esta","Este","Esa","Estas"],"Esta niña es mi amiga.","這個女孩是我的朋友。","c","f","s","niña","la"),
+  E("(Media distancia) ______ ríos son grandes.","Esos",["Esos","Esas","Estos","Ese"],"Esos ríos son grandes.","那些河很大。","m","m","p","ríos","los")];
+ /* 表格每格：點了先念單字、再念片語 */
+ const table={nm:"perro",npl:"perros",fm:"mesa",fpl:"mesas",neu:{Esto:"¿Qué es esto?",Eso:"Eso es fácil."}};
+ /* 解說區可點播的句子／片語 */
+ const ex=["Este perro es pequeño.","Ese teléfono está allí.","Esta fruta","Estos niños","Estas verduras","Esa nieve","Ese río","Esos ríos",
+  "¿Qué es esto?","¿Qué es eso?","Esto es difícil.","Eso es fácil.","Este teléfono es pequeño.","Estas mesas","Este perro","Esa familia"];
+ const say=[];const put=s=>{if(s&&!say.includes(s))say.push(s)};
+ ["c","m"].forEach(d=>["m","f"].forEach(g=>forms[d][g].forEach(w=>put(w))));put("Esto");put("Eso");
+ ["c","m"].forEach(d=>{put(forms[d].m[0]+" "+table.nm);put(forms[d].m[1]+" "+table.npl);put(forms[d].f[0]+" "+table.fm);put(forms[d].f[1]+" "+table.fpl)});
+ Object.values(table.neu).forEach(put);
+ nouns.forEach(N=>["c","m"].forEach(d=>{put(forms[d][N[2]][0]+" "+N[0]);put(forms[d][N[2]][1]+" "+N[1])}));
+ ej.forEach(q=>put(q.say));ex.forEach(put);
+ return {forms,nouns,ej,table,ex,say};
+})();
 const C=[
  /* A. 近處 0–4 */
  {"w":"Este","zh":"這個（陽性單數・近）","en":"This","pos":"指示詞・陽性・單數・近","ex":"Este perro (el que está al lado de Sara).","exen":"This dog (the one next to Sara)."},
@@ -71,34 +107,25 @@ decks:[
   {"q":"（中距離）那位男老師在講電話。","a":["Ese profesor habla por teléfono."],"pic":["1f468-200d-1f3eb",1],"tag":"Ejercicio 6"},
   {"q":"（不知道是什麼）地上的這個是什麼？","a":["¿Qué es esto que hay en el suelo?"],"pic":["1f4a1",1],"tag":"Ejercicio 7"}]}],
 texts:[
- {id:"key",
-  title:"本單元重點：指示詞 Demostrativos",
-  tag:"文法說明（只顯示、不念）",
-  html:[
-   "En español, la distancia se expresa en dos categorías (<b>Cerca</b> y <b>Media distancia</b>).<br><span class=\"mu\">In Spanish, the distance is expressed in two categories (near and middle distance).<br>西班牙文用兩種距離來分：<b>近處</b>和<b>中距離</b>。</span>",
-   "<b>1. Cerca de mí (Aquí)</b>　Near me｜靠近我（這裡）<br>Usamos <b>ESTE / ESTA</b> cuando alguien puede tocar el objeto o lo tiene en la mano.<br><span class=\"mu\">We use This when one can reach an object or has it in its hand.<br>伸手摸得到、或拿在手上的東西，用 <b>este / esta</b>。</span>",
-   "<b>2. Cerca de ti / Un poco lejos (Allí)</b>｜靠近你／有點遠（那裡）<br>Usamos <b>ESE / ESA</b> cuando el objeto está a una distancia media o cerca de la persona con la que hablamos.<br><span class=\"mu\">We use That when the object is at a middle distance or near the person we are talking to.<br>東西在中等距離、或靠近對話的對方，用 <b>ese / esa</b>。</span>",
-   "<b>性數變化</b>（跟著名詞的陰陽性、單複數變）<br>Masculino 陽性：<b>Este</b> (perro)・<b>Estos</b> (perros)｜<b>Ese</b> (perro)・<b>Esos</b> (perros)<br>Femenino 陰性：<b>Esta</b> (mesa)・<b>Estas</b> (mesas)｜<b>Esa</b> (mesa)・<b>Esas</b> (mesas)<br><span class=\"mu\">左邊是近處 Cerca（單數・複數），右邊是中距離 Media（單數・複數）。</span>",
-   "<b>¿Y qué pasa con \"ESTO\" y \"ESO\"?</b><br>Estas son las formas neutras. Se usan solo cuando:<br>1. No sabemos qué es el objeto: \"<b>¿Qué es esto?</b>\" (tienes algo raro en la mano).<br>2. Hablamos de una situación o idea: \"<b>Eso es muy divertido</b>\" (ir a la playa).<br><span class=\"mu\">esto／eso 是中性形式，只用在：① 不知道那是什麼東西（手上拿著怪東西：「這是什麼？」）；② 指一個情境或想法（去海灘：「那很好玩」）。</span>"],
-  paras:[]},
  {id:"ej",
-  title:"講義例句：近處・中距離・中性",
-  tag:"可跟讀・括號裡的西文也要念（灰字是中文／英文翻譯）",
+  title:"講義例句：近處・中距離",
+  tag:"可跟讀・點任一句可單獨聽（灰字是中文翻譯）",
   paras:[
-   ["Este perro (el que está al lado de Sara). [[這隻狗（在 Sara 旁邊的那隻）｜This dog (the one next to Sara).]]",
-    "Esta manzana (está en su mochila). [[這個蘋果（在她的背包裡）｜This apple (it's in her backpack).]]"],
-   ["Ese gato (el que está en la roca, Peter lo ve pero no lo toca). [[那隻貓（在岩石上的那隻，Peter 看得到但摸不到）｜That cat (the one on the rock; Peter sees it but doesn't touch it).]]",
-    "Esa ventana (la de la escuela que Peter ve desde la calle). [[那扇窗戶（Peter 從街上看到的學校窗戶）｜That window (the school window that Peter sees from the street).]]"],
-   ["¿Qué es esto? [[這是什麼？（手上拿著怪東西）｜What is this?]]",
-    "Eso es muy divertido. [[那很好玩。（指「去海灘」這件事）｜That is a lot of fun.]]"]]},
+   ["Este perro es pequeño.","Esta fruta es buena.","Estos niños están aquí.","Estas verduras son grandes."],
+   ["Ese teléfono está allí.","Esa profesora es buena.","Esos ríos son grandes.","Esas familias están allí."]],
+  zh:[["這隻狗很小。","這個水果很好。","這些孩子在這裡。","這些蔬菜很大。"],["那支電話在那裡。","那位女老師很好。","那些河很大。","那些家庭在那裡。"]]},
  {id:"pr",
   title:"Práctica rápida",
   tag:"可跟讀・只念引號裡的那一句（灰字是情境）",
   paras:[[
-   "Esta manzana es roja. [[1. Pedro 手上拿著一顆蘋果]]",
-   "Esos zapatos son nuevos. [[2. Marta 指著兩公尺外朋友的鞋子]]",
-   "Esa luna brilla mucho. [[3. Sara 和 Marta 看著天上的月亮]]",
-   "¿Qué es esto? [[4. Manuel 在沙子裡發現怪東西，不知道是什麼]]",
-   "Estos perros son muy divertidos. [[5. Javier 指著在他身邊玩的狗]]"]],
-  zh:[["這顆蘋果是紅色的。","那些鞋子是新的。","那個月亮很亮。","這是什麼？","這些狗很有趣。"]]}]};
+   "Este teléfono es pequeño. [[1. 一個男孩拿著一支電話]]",
+   "Ese perro es grande. [[2. 兩公尺外有一隻狗]]",
+   "Ese río es grande. [[3. 中距離有一條河]]",
+   "¿Qué es esto? [[4. Manuel 看到奇怪的東西，不知道是什麼]]",
+   "Estas frutas son buenas. [[5. 旁邊有一些水果]]"]],
+  zh:[["這支電話很小。","那隻狗很大。","那條河很大。","這是什麼？","這些水果很好。"]]}],
+/* lab：課文分頁的解說＋表格＋記憶遊戲（week06-extra.js 用）。say＝這些區塊會念到的所有西文（gen_week06_audio.js／check_audio.js 會讀）。
+   forms[距離 c 近／m 中][性別 m／f]＝[單數, 複數]、neu＝中性；nouns＝遊戲 1 的名詞 [單數, 複數, 性別, 中文, 圖示]；
+   ej＝講義 Ejercicio 16 題（d 距離、g 性別 m／f／n 中性、n 單複數、noun 名詞、art 冠詞、o 選項：第 7／13、8／14 題 esto 與 eso 都對，所以選項只放一個中性詞）。 */
+lab:LAB};
 })();

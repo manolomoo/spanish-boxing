@@ -6,7 +6,7 @@ const V=fs.readFileSync(path.join(ROOT,"version.txt"),"utf8").trim();
 const SITE="西班牙文-拳王之路";
 const ICON=`<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🥊%3C/text%3E%3C/svg%3E">`;
 const HEAD=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache"><meta name="viewport" content="width=device-width,initial-scale=1">`;
-/* 每單元：名稱、小測驗標題、口說標題、是否有吊人遊戲 */
+/* 每單元：名稱、小測驗標題、口說標題、是否有吊人遊戲、extra＝多載 weekNN-extra.js（並在 body 加 class uN） */
 const U=[
  {n:0,name:"文法術語 Gramática",quiz:"小測驗：西 ↔ 中 ↔ 英・判斷詞類",speak:"口說練習：術語與例句"},
  {n:1,name:"冠詞",quiz:"小測驗：選出正確的冠詞・單字中文",speak:"口說練習：Hay ________ en la foto."},
@@ -14,7 +14,7 @@ const U=[
  {n:3,name:"動詞 Verbos 1",quiz:"小測驗：選出正確的動詞變化",speak:"口說練習：替換主詞說動詞"},
  {n:4,name:"Estar + Gerundio",quiz:"小測驗：填入 estar 或現在分詞",speak:"口說練習：看圖說兩句"},
  {n:5,name:"Ser + 形容詞・顏色",quiz:"小測驗：性數一致・Ser 變位・Escribe",speak:"口說練習：Ser + 形容詞"},
- {n:6,name:"指示詞 Demostrativos",quiz:"小測驗：選出正確的指示詞",speak:"口說練習：看情境說指示詞"}];
+ {n:6,name:"指示詞 Demostrativos",quiz:"小測驗：選出正確的指示詞",speak:"口說練習：看情境說指示詞",extra:1}];
 const index=`${HEAD}
 <title>${SITE}</title>${ICON}<style>
 :root{--bg:#f6f7fb;--fg:#1b1d24;--mu:#6b7080;--cd:#fff;--ln:#e3e5ec;--ac:#2f6fed}
@@ -26,7 +26,7 @@ a.card:active{transform:scale(.98)}.t{display:flex;justify-content:space-between
 </style></head><body><div class="w"><h1 style="margin-top:12px">🥊 ${SITE}</h1><p class="sub">依學習順序的單元（新的在上）｜單字 → 課文 → 其他｜自然語音（西文 Elvira／英文 Jenny）＋回音法：先聽、心裡回音、再大聲跟讀</p><div id="rpgc"></div><div id="list"></div></div>
 <script>window.PAGEVER="${V}"</script><script src="rw.js?v=${V}"></script><script src="rpg.js?v=${V}"></script><script>RW.home(document.getElementById("list"));RPG.home(document.getElementById("rpgc"))</script></body></html>
 `;
-const week=u=>{const wk="week0"+u.n;return `${HEAD}<title>單元 ${u.n}｜${u.name}・${SITE}</title>${ICON}<link rel="stylesheet" href="style.css?v=${V}"></head><body><div class="w">
+const week=u=>{const wk="week0"+u.n;return `${HEAD}<title>單元 ${u.n}｜${u.name}・${SITE}</title>${ICON}<link rel="stylesheet" href="style.css?v=${V}"></head><body${u.extra?` class="u${u.n}"`:""}><div class="w">
 <header class="wk">
 <div class="wk-top"><a class="nav" href="index.html">← 西班牙文首頁</a>
 <h1>單元 ${u.n}<span class="wk-date">${u.name}</span></h1></div>
@@ -61,7 +61,7 @@ ${u.hang?`<div class="box"><b class="c">吊人遊戲 Ahorcado：猜單字</b><di
 <div class="ft">發音：西班牙文 Elvira（es-ES）、英文 Jenny（en-US），皆為預錄自然語音。圖示：Twemoji（CC-BY 4.0）；顏色用色塊。</div>
 </section>
 </div>
-<script>window.PAGEVER="${V}"</script><script src="rw.js?v=${V}"></script><script src="rpg.js?v=${V}"></script><script src="${wk}-audio.js?v=${V}"></script><script src="speech.js?v=${V}"></script><script src="${wk}-data.js?v=${V}"></script><script src="${wk}-icons.js?v=${V}"></script><script src="unit.js?v=${V}"></script>
+<script>window.PAGEVER="${V}"</script><script src="rw.js?v=${V}"></script><script src="rpg.js?v=${V}"></script><script src="${wk}-audio.js?v=${V}"></script><script src="speech.js?v=${V}"></script><script src="${wk}-data.js?v=${V}"></script><script src="${wk}-icons.js?v=${V}"></script><script src="unit.js?v=${V}"></script>${u.extra?`<script src="${wk}-extra.js?v=${V}"></script>`:""}
 <script>
 (function(){
   const nav=document.getElementById("jump");

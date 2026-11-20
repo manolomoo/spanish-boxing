@@ -16,6 +16,7 @@ fs.readdirSync(ROOT).filter(f=>/^week\d\d-data\.js$/.test(f)).sort().forEach(f=>
  (W.quiz||[]).forEach(q=>add(q.say,"測驗 "+q.q));
  (W.texts||[]).forEach(t=>(t.paras||[]).forEach(p=>p.forEach(s=>add(plain(s),"課文 "+t.id))));
  (W.decks||[]).forEach(d=>d.items.forEach(it=>{(it.say||it.a).forEach(a=>add(a,"口說 "+d.name));if(d.kind==="qa")add(it.q.replace(/^(Q\d|Question):\s*/,""),"口說題目 "+d.name)}));
+ (W.lab&&W.lab.say||[]).forEach(s=>add(s,"課文解說／遊戲"));
  const m=[...S].filter(([s])=>!C[s]);m.forEach(([s,why])=>console.log("缺音檔 "+wk+"｜"+why+"｜"+s));miss+=m.length;total+=S.size;
  const paths=[...new Set(Object.values(C))];paths.forEach(p=>{const fp=path.join(ROOT,p);if(!fs.existsSync(fp)||fs.statSync(fp).size<500){console.log("檔案不存在或太小 "+p);bad++}});files+=paths.length;
  const onDisk=fs.readdirSync(path.join(ROOT,wk+"-audio")).filter(x=>x.endsWith(".mp3")).length;

@@ -20,6 +20,7 @@ const add=(k,lang)=>{if(!k||typeof k!=="string")return;const o=L.get(k);if(o&&o!
 (W.quiz||[]).forEach(q=>add(q.say,"es"));
 (W.texts||[]).forEach(t=>(t.paras||[]).forEach(p=>p.forEach(s=>add(plain(s),"es"))));
 (W.decks||[]).forEach(d=>d.items.forEach(it=>{(it.say||it.a).forEach(a=>add(a,"es"));if(d.kind==="qa")add(it.q.replace(/^(Q\d|Question):\s*/,""),"es")}));
+(W.lab&&W.lab.say||[]).forEach(s=>add(s,"es"));   // 課文分頁的解說／表格／遊戲（week06-extra.js）
 const text=k=>k.replace(/^en:/,"");                           // "en:xxx" 這種前綴 key，念和 hash 的都是 xxx
 const jobs=[...L].map(([k,lang])=>({k,lang,t:text(k),rel:WK+"-audio/"+lang+"_"+sha16(text(k))+".mp3"}));
 const okFile=f=>fs.existsSync(f)&&fs.statSync(f).size>=MIN;
