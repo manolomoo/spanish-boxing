@@ -2,7 +2,8 @@
    只在 week06.html 載入（tools/build_pages.js 的 extra 旗標），CSS 全部限定在 body.u6 #sec-t，不影響其他單元。
    資料：window.WEEK.lab（week06-data.js）；會念到的字都列在 lab.say，由 tools/gen_week06_audio.js 產生 mp3（Elvira）。
    播音：每個按鈕一開頭同步呼叫 TTS.unlock()，再 stop()（unit.js 全域）→ await play1(k)（unit.js 全域、rw.js 包裝過；null＝被中斷）。
-   答錯不播音、只顯示中文解釋；答對才播。XP：RW.emit({uid:"u6",t:"quiz",ok,isNew})（同現有小測驗規則），
+   v6：遊戲 1 題目出現時念名詞（不念指示詞）、遊戲 3 念不含答案的題幹 qSay；作答後（對錯都）念正確片語／整句；遊戲 2 點字卡念該字、放錯不播音。
+   使用者點擊觸發的題目重繪才自動播，腳本載入時那次不播。XP：RW.emit({uid:"u6",t:"quiz",ok,isNew})（同現有小測驗規則），
    「答對過」記在 localStorage esBoxerU6G1（不碰 esBoxerRW1／esBoxerRPG1）。 */
 (function(){
 const W=window.WEEK,L=W&&W.lab,sec=document.getElementById("sec-t"),texts=document.getElementById("texts");
@@ -126,8 +127,8 @@ root.querySelector(".u6-toc").addEventListener("click",e=>{const b=e.target.clos
 const shuf=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
 const G=document.getElementById("u6-g");let gi=0;
 const GAMES=[g1,g2,g3];
-root.querySelector(".u6-gseg").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;if(typeof stop==="function")stop();gi=+b.dataset.g;
- root.querySelectorAll(".u6-gseg button").forEach(x=>x.classList.toggle("on",x===b));clearInterval(t2);GAMES[gi](true)});
+root.querySelector(".u6-gseg").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;U();if(typeof stop==="function")stop();gi=+b.dataset.g;
+ root.querySelectorAll(".u6-gseg button").forEach(x=>x.classList.toggle("on",x===b));clearInterval(t2);GAMES[gi](true,true)});
 const optsHTML=o=>`<div class="u6-opts">${o.map(x=>`<button type="button" class="u6-opt" data-o="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
 function mark(box,pick,ans){box.querySelectorAll(".u6-opt").forEach(b=>{b.disabled=true;if(b.dataset.o===ans)b.classList.add("ok");else if(b.dataset.o===pick)b.classList.add("bad")})}
 const fb=(ok,h)=>`<div class="u6-fb ${ok?"ok":"bad"}">${ok?"¡Muy bien! 答對了 👏<br>":"再想想 🤔<br>"}${h}</div>`;
@@ -136,22 +137,23 @@ const fb=(ok,h)=>`<div class="u6-fb ${ok?"ok":"bad"}">${ok?"¡Muy bien! 答對�
 const P1=[];L.nouns.forEach(N=>["c","m"].forEach(d=>["s","p"].forEach(n=>{const g=N[2],w=F[d][g][n==="s"?0:1],noun=n==="s"?N[0]:N[1];
  P1.push({d,g,n,noun,art:n==="p"?(g==="m"?"los":"las"):(g==="m"?"el":"la"),zh:N[3],ic:N[4],a:w,say:K(w+" "+noun)})})));
 let s1=null;
-function g1(fresh){if(fresh||!s1)s1={q:shuf(P1).slice(0,10),i:0,ok:0,pick:null};const st=s1;
+function g1(fresh,play){if(fresh||!s1)s1={q:shuf(P1).slice(0,10),i:0,ok:0,pick:null};const st=s1;
  if(st.i>=st.q.length){const r=st.ok,c=r===10?"完美！一拳 KO 🥊":r>=8?"很強！距離感抓到了 💪":r>=5?"不錯，再練一局會更穩 🙂":"先回去看一次表格，再來挑戰！";
   G.innerHTML=`<div class="u6-end"><div class="u6-big">答對 ${r} / 10</div><div>${c}</div><button type="button" class="u6-go" id="u6-g1r">再來一局 ›</button></div>`;
-  G.querySelector("#u6-g1r").onclick=()=>{U();g1(true)};return}
+  G.querySelector("#u6-g1r").onclick=()=>{U();g1(true,true)};return}
  const it=st.q[st.i],pic=PIC([it.ic,it.n==="p"?3:1]);
  const o=shuf([it.a,F[it.d==="c"?"m":"c"][it.g][it.n==="s"?0:1],F[it.d][it.g==="m"?"f":"m"][it.n==="s"?0:1],F[it.d][it.g][it.n==="s"?1:0]]);
  G.innerHTML=`<div class="u6-hd"><span>第 ${st.i+1} / 10 題</span><span>答對 ${st.ok}</span></div>
   <div class="u6-mu">東西在誰旁邊？選出正確的指示詞：</div>
   ${it.d==="c"?scene(pic,"","aquí",""):scene("",pic,"","allí")}
-  <div class="u6-q">＿＿ ${esc(it.noun)}</div><div class="u6-mu c">${esc(it.art+" "+it.noun)}・${esc(it.zh)}</div>
+  <div class="u6-q">＿＿ ${esc(it.noun)}</div><div class="u6-qs">${sp(it.noun,esc(it.noun),"u6-qb")}</div><div class="u6-mu c">${esc(it.art+" "+it.noun)}・${esc(it.zh)}</div>
   ${optsHTML(o)}<div id="u6-f1"></div>`;
  G.querySelectorAll(".u6-opt").forEach(b=>b.onclick=async()=>{U();if(st.pick)return;const pick=b.dataset.o,ok=pick===it.a;st.pick=pick;if(ok)st.ok++;
   mark(G,pick,it.a);xp("g1|"+it.say,ok);
-  G.querySelector("#u6-f1").innerHTML=fb(ok,(ok?"":whyBad(it,pick)+"<br>")+(ok?(it.d==="c"?"東西在<b>我身邊</b>，":"東西在<b>你那邊／有段距離</b>，")+whyOk(it,it.a):"正確：<b>"+esc(it.say)+"</b>"))+`<button type="button" class="u6-go" id="u6-n1">${st.i+1<st.q.length?"下一題 ›":"看結果 ›"}</button>`;
-  G.querySelector("#u6-n1").onclick=()=>{U();if(typeof stop==="function")stop();st.i++;st.pick=null;g1()};
-  if(ok)await say([it.say])})}
+  G.querySelector("#u6-f1").innerHTML=fb(ok,(ok?"":whyBad(it,pick)+"<br>")+(ok?(it.d==="c"?"東西在<b>我身邊</b>，":"東西在<b>你那邊／有段距離</b>，")+whyOk(it,it.a):"正確：<b>"+esc(it.say)+"</b>")+'<div class="u6-fs">'+sp(it.say)+"</div>")+`<button type="button" class="u6-go" id="u6-n1">${st.i+1<st.q.length?"下一題 ›":"看結果 ›"}</button>`;
+  G.querySelector("#u6-n1").onclick=()=>{U();if(typeof stop==="function")stop();st.i++;st.pick=null;g1(false,true)};
+  await say([it.say])});
+ if(play&&st.i<st.q.length)say([it.noun])}
 
 /* ===== 遊戲 2：表格拼圖（先點字卡、再點格子；整張完成才給一次 XP） ===== */
 const TILES=[F.c.m[0],F.c.m[1],F.c.f[0],F.c.f[1],F.m.m[0],F.m.m[1],F.m.f[0],F.m.f[1],F.c.neu,F.m.neu];TILES.forEach(K);
@@ -167,7 +169,7 @@ function g2(fresh){if(fresh||!s2)s2={left:shuf(TILES),sel:null,err:0,t0:0,done:{
   <div class="u6-mu">先點下面一張字卡，再點它在表格裡的位置。</div>
   <div class="u6-pz">${tableHTML(true)}</div><div class="u6-tiles"></div><div id="u6-f2"></div>`;
  Object.keys(st.done).forEach(w=>fill(w));drawTiles();if(st.t0&&st.left.length)tick();
- G.querySelectorAll(".u6-slot").forEach(td=>td.onclick=async()=>{U();const f=G.querySelector("#u6-f2");if(st.done[td.dataset.w])return;
+ G.querySelectorAll(".u6-slot").forEach(td=>td.onclick=async()=>{U();const f=G.querySelector("#u6-f2");if(st.done[td.dataset.w]){await say([td.dataset.w],td);return}
   if(!st.sel){f.innerHTML=`<div class="u6-fb">先點下面一張字卡 👇</div>`;return}
   const w=st.sel;if(w===td.dataset.w){st.done[w]=1;st.left=st.left.filter(x=>x!==w);st.sel=null;fill(w);drawTiles();
    f.innerHTML=`<div class="u6-fb ok">✔ ${esc(w)} 放對了！</div>`;
@@ -184,28 +186,30 @@ function tick(){clearInterval(t2);t2=setInterval(()=>{const e=document.getElemen
 function drawTiles(){const st=s2,box=G.querySelector(".u6-tiles");
  box.innerHTML=st.left.map(w=>`<button type="button" class="u6-tile${st.sel===w?" sel":""}" data-w="${w}">${AT[w.toLowerCase()].g==="n"?w.toLowerCase():w}</button>`).join("");
  box.querySelectorAll(".u6-tile").forEach(b=>b.onclick=()=>{U();if(!st.t0){st.t0=Date.now();tick()}st.sel=st.sel===b.dataset.w?null:b.dataset.w;drawTiles();
-  const f=G.querySelector("#u6-f2");if(f&&!f.querySelector(".u6-end"))f.innerHTML=st.sel?`<div class="u6-fb">選了 <b>${esc(b.textContent)}</b>，點它在表格裡的位置 ☝️</div>`:""})}
+  const f=G.querySelector("#u6-f2");if(f&&!f.querySelector(".u6-end"))f.innerHTML=st.sel?`<div class="u6-fb">選了 <b>${esc(b.textContent)}</b>，點它在表格裡的位置 ☝️</div>`:"";
+  if(st.sel)say([st.sel]);else if(typeof stop==="function")stop()})}
 
 /* ===== 遊戲 3：Ejercicio 擂台（講義 16 題，打完 KO 畫面） ===== */
-let s3=null;L.ej.forEach(q=>K(q.say));
-function g3(fresh){if(fresh||!s3)s3={i:0,ok:0,cb:0,best:0,pick:null,o:null};const st=s3,N=L.ej.length;
+let s3=null;L.ej.forEach(q=>{K(q.say);K(q.qSay)});
+function g3(fresh,play){if(fresh||!s3)s3={i:0,ok:0,cb:0,best:0,pick:null,o:null};const st=s3,N=L.ej.length;
  if(st.i>=N){const r=st.ok,t=r===N?"完美 KO！🏆":r>=12?"KO 勝！🥊":r>=8?"判定勝 👍":"這場被對手撐過了，再打一場！";
   G.innerHTML=`<div class="u6-end u6-ko"><div class="u6-kot">K.O.</div><div class="u6-big">${t}</div><div>答對 ${r} / ${N}・最佳連擊 ${st.best}</div><button type="button" class="u6-go" id="u6-g3r">再打一場 ›</button></div>`;
-  G.querySelector("#u6-g3r").onclick=()=>{U();g3(true)};return}
+  G.querySelector("#u6-g3r").onclick=()=>{U();g3(true,true)};return}
  const it=L.ej[st.i];if(!st.o)st.o=shuf(it.o);const hp=N-st.ok;
  G.innerHTML=`<div class="u6-hd"><span>第 ${st.i+1} / ${N} 回合</span><span>連擊 ${st.cb}</span></div>
   <div class="u6-hp"><span>🥊 對手 HP</span><div class="u6-bar"><i style="width:${hp/N*100}%"></i></div><b>${hp}</b></div>
-  <div class="u6-q u6-ql">${esc(it.q).replace("______",'<span class="u6-blank">＿＿</span>')}</div><div class="u6-mu c">${esc(it.zh)}</div>
+  <div class="u6-q u6-ql">${esc(it.q).replace("______",'<span class="u6-blank">＿＿</span>')}</div><div class="u6-qs">${sp(it.qSay,"聽題目","u6-qb")}</div><div class="u6-mu c">${esc(it.zh)}</div>
   ${it.g==="n"?'<div class="u6-mu c u6-s">（這題 esto／eso 其實都可以；選項裡只有一個中性詞）</div>':""}
   ${optsHTML(st.o)}<div id="u6-f3"></div>`;
  G.querySelectorAll(".u6-opt").forEach(b=>b.onclick=async()=>{U();if(st.pick)return;const pick=b.dataset.o,ok=pick===it.a;st.pick=pick;
   if(ok){st.ok++;st.cb++;st.best=Math.max(st.best,st.cb)}else st.cb=0;mark(G,pick,it.a);xp("g3|"+(st.i+1),ok);
   const bar=G.querySelector(".u6-bar i");if(bar)bar.style.width=(N-st.ok)/N*100+"%";G.querySelector(".u6-hp b").textContent=N-st.ok;
   if(ok)G.querySelector(".u6-blank").textContent=it.a;
-  G.querySelector("#u6-f3").innerHTML=fb(ok,ok?(st.cb>=3?"🔥 "+st.cb+" 連擊！<br>":"")+whyOk(it,it.a)+"<br><b>"+esc(it.say)+"</b>":whyBad(it,pick)+"<br>正確：<b>"+esc(it.say)+"</b>")+
+  G.querySelector("#u6-f3").innerHTML=fb(ok,(ok?(st.cb>=3?"🔥 "+st.cb+" 連擊！<br>":"")+whyOk(it,it.a)+"<br><b>"+esc(it.say)+"</b>":whyBad(it,pick)+"<br>正確：<b>"+esc(it.say)+"</b>")+'<div class="u6-fs">'+sp(it.say)+"</div>")+
    `<button type="button" class="u6-go" id="u6-n3">${st.i+1<N?"下一回合 ›":"看結果 ›"}</button>`;
-  G.querySelector("#u6-n3").onclick=()=>{U();if(typeof stop==="function")stop();st.i++;st.pick=null;st.o=null;g3()};
-  if(ok)await say([it.say])})}
+  G.querySelector("#u6-n3").onclick=()=>{U();if(typeof stop==="function")stop();st.i++;st.pick=null;st.o=null;g3(false,true)};
+  await say([it.say])});
+ if(play)say([it.qSay])}
 
 g1(true);
 window.U6X={keys:()=>[...KEYS],P1:P1.length,ej:L.ej.length};
@@ -260,6 +264,8 @@ body.u6 #u6-g{display:flex;flex-direction:column;gap:12px}body.u6 #u6-g>*{min-wi
 body.u6 .u6-hd{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:16px;color:var(--mu);font-weight:700}
 body.u6 .u6-q{font-size:30px;font-weight:800;text-align:center;line-height:1.3;overflow-wrap:anywhere}
 body.u6 .u6-ql{font-size:26px}
+body.u6 .u6-qs{text-align:center;margin-top:-4px}body.u6 .u6-qb{min-height:52px;min-width:120px;text-align:center}
+body.u6 .u6-fs{margin-top:8px}
 body.u6 .u6-blank{color:var(--ac);border-bottom:3px solid var(--ac);padding:0 4px}
 body.u6 .u6-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 body.u6 .u6-opt,body.u6 .u6-go{flex:none;min-width:0;min-height:60px;font-size:24px;font-weight:800;border-radius:14px;border:2px solid var(--ln);background:var(--cd);color:var(--fg);overflow-wrap:anywhere;padding:8px}

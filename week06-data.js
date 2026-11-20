@@ -9,7 +9,9 @@ const LAB=(function(){
  const forms={c:{m:["Este","Estos"],f:["Esta","Estas"],neu:"Esto"},m:{m:["Ese","Esos"],f:["Esa","Esas"],neu:"Eso"}};
  const nouns=[["perro","perros","m","狗","1f415"],["niño","niños","m","男孩","1f466"],["teléfono","teléfonos","m","電話","1f4f1"],["profesor","profesores","m","男老師","1f468-200d-1f3eb"],
   ["fruta","frutas","f","水果","1f34e"],["niña","niñas","f","女孩","1f467"],["verdura","verduras","f","蔬菜","1f966"],["profesora","profesoras","f","女老師","1f469-200d-1f3eb"]];
- const E=(q,a,o,say,zh,d,g,n,noun,art)=>({q,a,o,say,zh,d,g,n,noun,art});
+ /* qSay＝題目句去掉 (Cerca) 等提示和空格（不含答案），遊戲 3 題目旁 🔊 念這句，例如 "(Cerca) ______ niño es mi amigo." → "niño es mi amigo." */
+ const qs=q=>q.replace(/^\([^)]*\)\s*/,"").replace(/_{2,}/g,"").replace(/\s+([?.!,])/g,"$1").replace(/\s+/g," ").trim();
+ const E=(q,a,o,say,zh,d,g,n,noun,art)=>({q,a,o,say,zh,d,g,n,noun,art,qSay:qs(q)});
  const ej=[
   E("(Cerca) ______ niño es mi amigo.","Este",["Este","Esto","Esta","Estos"],"Este niño es mi amigo.","這個男孩是我的朋友。","c","m","s","niño","el"),
   E("(Media distancia) ______ perros están allí.","Esos",["Esos","Esas","Ese","Estos"],"Esos perros están allí.","那些狗在那裡。","m","m","p","perros","los"),
@@ -38,6 +40,7 @@ const LAB=(function(){
  Object.values(table.neu).forEach(put);
  nouns.forEach(N=>["c","m"].forEach(d=>{put(forms[d][N[2]][0]+" "+N[0]);put(forms[d][N[2]][1]+" "+N[1])}));
  ej.forEach(q=>put(q.say));ex.forEach(put);
+ nouns.forEach(N=>{put(N[0]);put(N[1])});ej.forEach(q=>put(q.qSay));   // v6：遊戲 1 題目念名詞、遊戲 3 題目念不含答案的題幹
  return {forms,nouns,ej,table,ex,say};
 })();
 /* 單字卡（v5 起全部依新講義）。名詞片語：表格的 perro／mesa 8 張＋新講義的名詞（fruta、niño、niña、teléfono、verdura、amigo、profesor(a)、río、familia、nieve）。 */
